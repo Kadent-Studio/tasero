@@ -62,9 +62,7 @@ export function generateApiKey(): {
 
 // ── CRUD ─────────────────────────────────────────────────────────────────────
 
-export async function createApiKey(
-  input: CreateApiKeyInput,
-): Promise<CreatedApiKey> {
+export async function createApiKey(input: CreateApiKeyInput): Promise<CreatedApiKey> {
   const { fullKey, prefix, hash } = generateApiKey();
 
   const [{ id }] = await db
@@ -145,9 +143,7 @@ export type ApiKeyInfo = {
   group: string | null;
 };
 
-export async function findApiKeyByToken(
-  token: string,
-): Promise<ApiKeyInfo | null> {
+export async function findApiKeyByToken(token: string): Promise<ApiKeyInfo | null> {
   const hash = crypto.createHash("sha256").update(token).digest("hex");
 
   const record = await db

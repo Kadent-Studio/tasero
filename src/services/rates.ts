@@ -34,11 +34,7 @@ function fetchBcvHtml(): Promise<string> {
   });
 }
 
-function findRateInHtml(
-  $: cheerio.CheerioAPI,
-  selector: string,
-  currency: string,
-) {
+function findRateInHtml($: cheerio.CheerioAPI, selector: string, currency: string) {
   const raw = $(selector).text().trim();
 
   if (!raw) {

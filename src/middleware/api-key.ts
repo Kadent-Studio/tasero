@@ -21,10 +21,7 @@ export function apiKeyMiddleware() {
 
       // Update last_used_at in the background (fire-and-forget)
       waitUntil(
-        db
-          .update(apiKeys)
-          .set({ lastUsedAt: new Date() })
-          .where(eq(apiKeys.id, record.id)),
+        db.update(apiKeys).set({ lastUsedAt: new Date() }).where(eq(apiKeys.id, record.id)),
       );
 
       c.set("apiKey", record);
@@ -55,8 +52,7 @@ export function requireScope(requiredScope: string) {
     }
 
     // Scope check — wildcard `*` grants access to everything
-    const hasScope =
-      record.scopes.includes("*") || record.scopes.includes(requiredScope);
+    const hasScope = record.scopes.includes("*") || record.scopes.includes(requiredScope);
     if (!hasScope) {
       const status = 403;
       throw new HTTPException(status, {

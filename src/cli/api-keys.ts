@@ -86,7 +86,8 @@ async function screenCreate() {
         : "Enter a positive number or leave empty",
   });
 
-  const expiresAt = days ? new Date(Date.now() + Number(days) * 86400000) : null;
+  const maxAge = days ? Number(days) * 86400000 : null; // Convert days to milliseconds
+  const expiresAt = maxAge ? new Date(Date.now() + maxAge) : null;
 
   const created = await createApiKey({
     name,

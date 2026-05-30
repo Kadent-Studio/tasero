@@ -1,5 +1,5 @@
 import { sql } from "drizzle-orm";
-import { integer, jsonb, pgTable, text } from "drizzle-orm/pg-core";
+import { boolean, integer, jsonb, pgTable, text } from "drizzle-orm/pg-core";
 
 export const apiKeys = pgTable("api_keys", {
   id: text("id").primaryKey(), // UUID v7
@@ -17,7 +17,7 @@ export const apiKeys = pgTable("api_keys", {
   scopes: jsonb("scopes").notNull().default([]),
 
   // Lifecycle
-  isActive: integer("is_active").notNull().default(1), // 0 = revoked, 1 = active
+  isActive: boolean("is_active").notNull().default(true), // 0 = revoked, 1 = active
   expiresAt: integer("expires_at"), // Unix epoch seconds, null = never expires
   lastUsedAt: integer("last_used_at"), // Unix epoch seconds
   revokedAt: integer("revoked_at"), // Unix epoch seconds, set when isActive flips to 0

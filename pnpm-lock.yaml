@@ -8,6 +8,9 @@ importers:
 
   .:
     dependencies:
+      '@hono/otel':
+        specifier: ^1.1.2
+        version: 1.1.2(hono@4.12.23)
       '@hono/zod-validator':
         specifier: ^0.8.0
         version: 0.8.0(hono@4.12.23)(zod@4.4.3)
@@ -389,6 +392,11 @@ packages:
     engines: {node: '>=18'}
     cpu: [x64]
     os: [win32]
+
+  '@hono/otel@1.1.2':
+    resolution: {integrity: sha512-UaBMKPGaQTj4sjvpGqQ+57eolTwMI2znzxV/QBUF99XxhcmqtqaZX95flXpGgWb+lnlinlCy23Y1sZ8+TzzM9A==}
+    peerDependencies:
+      hono: '>=4.0.0'
 
   '@hono/zod-validator@0.8.0':
     resolution: {integrity: sha512-5uS4S1/LKtZQYvD4BtpPUFkOv8d1wNxHHrChm26buMiEYc1FrHWvDUaKVBwkiVtvSExHSpLGDvcnpI2Copyj9w==}
@@ -1499,6 +1507,12 @@ snapshots:
 
   '@esbuild/win32-x64@0.28.0':
     optional: true
+
+  '@hono/otel@1.1.2(hono@4.12.23)':
+    dependencies:
+      '@opentelemetry/api': 1.9.1
+      '@opentelemetry/semantic-conventions': 1.41.1
+      hono: 4.12.23
 
   '@hono/zod-validator@0.8.0(hono@4.12.23)(zod@4.4.3)':
     dependencies:

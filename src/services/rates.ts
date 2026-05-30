@@ -10,7 +10,8 @@ export interface BcvRate {
 }
 
 export interface BcvResult {
-  date: string;
+  ratesDate: string;
+  consultedAt: string;
   rates: BcvRate[];
 }
 
@@ -41,26 +42,34 @@ function findRateInHtml($: cheerio.CheerioAPI, selector: string, currency: strin
   }
 
   // Remove extra whitespace and normalize decimal separator
-  const cleaned = raw.replace(/[^\d,.]/g, "").replace(",", ".");
+  const cleaned = raw.replace(",", ".");
   return { currency, rate: Number.parseFloat(cleaned) };
 }
 
-function parseBcvRates(html: string): BcvRate[] {
-  const $ = cheerio.load(html);
-  const dolarRate = findRateInHtml($, "#dolar", "USD");
-  const euroRate = findRateInHtml($, "#euro", "EUR");
+function parseBcvRates($: cheerio.CheerioAPI): BcvRate[] {
+  const dolarRate = findRateInHtml($, "#dolar strong", "USD");
+  const euroRate = findRateInHtml($, "#euro strong", "EUR");
+  const yuanRate = findRateInHtml($, "#yuan strong", "CNY");
+  const liraRate = findRateInHtml($, "#lira strong", "TRY");
+  const rubloRate = findRateInHtml($, "#rublo strong", "RUB");
 
-  return [dolarRate, euroRate];
+  return [dolarRate, euroRate, yuanRate, liraRate, rubloRate];
 }
 
 // ── Business logic ───────────────────────────────────────────────────────────
 
 export async function getBcvRates(): Promise<BcvResult> {
   const html = await fetchBcvHtml();
-  const rates = parseBcvRates(html);
+  const $ = cheerio.load(html);
+  const rates = parseBcvRates($);
+
+  const consultedAt = new Date().toISOString();
+  const dateText =
+    $("#dolar").parent().find('[datatype="xsd:dateTime"]').attr("content") || consultedAt;
 
   return {
-    date: new Date().toISOString(),
     rates,
+    ratesDate: dateText,
+    consultedAt: consultedAt,
   };
 }

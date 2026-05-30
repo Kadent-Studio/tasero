@@ -1,8 +1,11 @@
 import { sql } from "drizzle-orm";
-import { boolean, integer, jsonb, pgTable, text } from "drizzle-orm/pg-core";
+import { boolean, jsonb, pgTable, text, timestamp } from "drizzle-orm/pg-core";
+import { v7 as uuidv7 } from "uuid";
 
 export const apiKeys = pgTable("api_keys", {
-  id: text("id").primaryKey(), // UUID v7
+  id: text("id")
+    .primaryKey()
+    .$defaultFn(() => uuidv7()), // UUID v7
 
   // Identification
   name: text("name").notNull(), // Human-readable label
@@ -14,20 +17,19 @@ export const apiKeys = pgTable("api_keys", {
   group: text("group"), // Optional grouping (e.g. "team-1234" or "project-5678")
 
   // Permissions — JSON array of scope strings (e.g. ["read:items","write:items"])
-  scopes: jsonb("scopes").notNull().default([]),
+  scopes: jsonb("scopes").$type<string[]>().notNull().default([]),
 
   // Lifecycle
-  isActive: boolean("is_active").notNull().default(true), // 0 = revoked, 1 = active
-  expiresAt: integer("expires_at"), // Unix epoch seconds, null = never expires
-  lastUsedAt: integer("last_used_at"), // Unix epoch seconds
-  revokedAt: integer("revoked_at"), // Unix epoch seconds, set when isActive flips to 0
+  isActive: boolean("is_active").notNull().default(true),
+  expiresAt: timestamp("expires_at", { withTimezone: true }), // null = never expires
+  lastUsedAt: timestamp("last_used_at", { withTimezone: true }),
+  revokedAt: timestamp("revoked_at", { withTimezone: true }), // set when isActive flips to false
   revokedReason: text("revoked_reason"), // Why the key was revoked
 
-  // Timestamps (Unix epoch seconds)
-  createdAt: integer("created_at")
+  // Timestamps
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  updatedAt: timestamp("updated_at", { withTimezone: true })
     .notNull()
-    .default(sql`(extract(epoch from now())::integer)`),
-  updatedAt: integer("updated_at")
-    .notNull()
-    .default(sql`(extract(epoch from now())::integer)`),
+    .defaultNow()
+    .$onUpdate(() => sql`CURRENT_TIMESTAMP`),
 });

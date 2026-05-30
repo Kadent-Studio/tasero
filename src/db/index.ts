@@ -7,9 +7,11 @@ export function getDb(bindings: CloudflareBindings) {
   return drizzle(bindings.DB, { schema, relations });
 }
 
+export type DrizzleDb = ReturnType<typeof getDb>;
+
 export const dbMiddleware = createMiddleware<{
   Bindings: CloudflareBindings;
-  Variables: { db: ReturnType<typeof getDb> };
+  Variables: { db: DrizzleDb };
 }>((c, next) => {
   const db = getDb(c.env);
   c.set("db", db);

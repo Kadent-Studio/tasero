@@ -9,7 +9,7 @@ export async function getOrInsertCache<T>(
   },
 ): Promise<T> {
   const { ttl, tags = [key] } = options;
-  const cache = getCache({ namespace: "tasero" });
+  const cache = getCache();
 
   const cached = (await cache.get(key)) as T | undefined;
   if (cached) return cached;

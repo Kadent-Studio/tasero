@@ -1,7 +1,7 @@
 import { desc, eq } from "drizzle-orm";
 import crypto from "node:crypto";
-import { db } from "../db/index";
-import { apiKeys } from "../db/schema";
+import { db } from "../db/index.js";
+import { apiKeys } from "../db/schema.js";
 
 const KEY_PREFIX = "sk_tas_";
 

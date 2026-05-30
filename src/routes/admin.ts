@@ -1,5 +1,5 @@
 import { Hono } from "hono";
-import { requireScope } from "../middleware/api-key";
+import { requireScope } from "../middleware/api-key.js";
 
 export const admin = new Hono();
 

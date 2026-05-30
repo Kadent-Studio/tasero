@@ -2,10 +2,10 @@ import { waitUntil } from "@vercel/functions";
 import { eq } from "drizzle-orm";
 import { bearerAuth } from "hono/bearer-auth";
 import { createMiddleware } from "hono/factory";
-import { db } from "../db/index";
-import { apiKeys } from "../db/schema";
-import { findApiKeyByToken, type ApiKeyInfo } from "../services/api-keys";
 import { HTTPException } from "hono/http-exception";
+import { db } from "../db/index.js";
+import { apiKeys } from "../db/schema.js";
+import { findApiKeyByToken, type ApiKeyInfo } from "../services/api-keys.js";
 
 // ── Types ────────────────────────────────────────────────────────────────────
 

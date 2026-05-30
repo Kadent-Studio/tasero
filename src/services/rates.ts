@@ -1,7 +1,7 @@
 import * as cheerio from "cheerio";
 import { get } from "node:https";
 import { text } from "node:stream/consumers";
-import { getOrInsertCache } from "../lib/cache";
+import { getOrInsertCache } from "../lib/cache.js";
 
 // ── Types ────────────────────────────────────────────────────────────────────
 

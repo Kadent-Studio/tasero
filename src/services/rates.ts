@@ -1,0 +1,71 @@
+import * as cheerio from "cheerio";
+import { get } from "node:https";
+import { text } from "node:stream/consumers";
+
+// ── Types ────────────────────────────────────────────────────────────────────
+
+export interface BcvRate {
+  currency: string;
+  rate: number;
+}
+
+export interface BcvResult {
+  date: string;
+  rates: BcvRate[];
+}
+
+// ── Scraping ─────────────────────────────────────────────────────────────────
+
+function fetchBcvHtml(): Promise<string> {
+  return new Promise<string>((resolve, reject) => {
+    const req = get(
+      "https://www.bcv.org.ve",
+      {
+        method: "GET",
+        rejectUnauthorized: false,
+      },
+      (res) => {
+        text(res).then(resolve, reject);
+      },
+    );
+
+    req.on("error", reject);
+    req.end();
+  });
+}
+
+function findRateInHtml(
+  $: cheerio.CheerioAPI,
+  selector: string,
+  currency: string,
+) {
+  const raw = $(selector).text().trim();
+
+  if (!raw) {
+    throw new Error(`No se pudo encontrar la tasa de cambio para ${currency}`);
+  }
+
+  // Remove extra whitespace and normalize decimal separator
+  const cleaned = raw.replace(/[^\d,.]/g, "").replace(",", ".");
+  return { currency, rate: Number.parseFloat(cleaned) };
+}
+
+function parseBcvRates(html: string): BcvRate[] {
+  const $ = cheerio.load(html);
+  const dolarRate = findRateInHtml($, "#dolar", "USD");
+  const euroRate = findRateInHtml($, "#euro", "EUR");
+
+  return [dolarRate, euroRate];
+}
+
+// ── Business logic ───────────────────────────────────────────────────────────
+
+export async function getBcvRates(): Promise<BcvResult> {
+  const html = await fetchBcvHtml();
+  const rates = parseBcvRates(html);
+
+  return {
+    date: new Date().toISOString(),
+    rates,
+  };
+}

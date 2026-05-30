@@ -3,6 +3,7 @@
   "type": "module",
   "scripts": {
     "dev": "vc dev",
+    "build": "tsgo",
     "start": "vc start",
     "fmt": "oxfmt",
     "fmt:check": "oxfmt --check",
@@ -24,14 +25,14 @@
   "devDependencies": {
     "@inquirer/prompts": "^8.5.0",
     "@types/node": "^24.12.4",
+    "@typescript/native-preview": "7.0.0-dev.20260421.2",
     "commander": "^14.0.3",
     "dotenv": "^17.4.2",
     "drizzle-kit": "1.0.0-rc.3",
     "execa": "^9.6.1",
     "oxfmt": "^0.52.0",
     "oxlint": "^1.67.0",
-    "tsx": "^4.22.3",
-    "typescript": "^6.0.3"
+    "tsx": "^4.22.3"
   },
   "packageManager": "pnpm@11.5.0+sha512.dbfcc4f81cf48597afd4bc391ffdf12c11f1a9fb83a395bfa6b0a2d9cc2fd8ffebafdb1ccbd529632153f793904c2615b7f09fe1a345473fd1c35845172a8eb1"
 }

@@ -1,26 +1,32 @@
 import * as cheerio from "cheerio";
 import { Hono } from "hono";
-import { Agent } from "undici";
+import { get } from "node:https";
+import { text } from "node:stream/consumers";
 
 export const rates = new Hono();
-const agent = new Agent({
-  // Disable SSL certificate validation for all requests made with this agent
-  connect: { rejectUnauthorized: false },
-});
+
+function getBcvHtml() {
+  return new Promise<string>((resolve, reject) => {
+    const req = get(
+      "https://www.bcv.org.ve",
+      {
+        method: "GET",
+        rejectUnauthorized: false, // Disable SSL certificate validation for this request
+      },
+      (res) => {
+        text(res).then(resolve, reject);
+      },
+    );
+
+    req.on("error", reject);
+
+    req.end();
+  });
+}
 
 rates.get("/bcv", async (c) => {
   try {
-    const res = await fetch("https://www.bcv.org.ve", {
-      dispatcher: agent as any,
-    });
-    if (!res.ok) {
-      return c.json(
-        { error: "Error al obtener la tasa de cambio del BCV" },
-        502,
-      );
-    }
-
-    const html = await res.text();
+    const html = await getBcvHtml();
     const $ = cheerio.load(html);
     const dolarRate = $("#dolar").text().trim();
 

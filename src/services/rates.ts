@@ -64,8 +64,11 @@ export async function getBcvRates(): Promise<BcvResult> {
   const rates = parseBcvRates($);
 
   const consultedAt = new Date().toISOString();
-  const dateText =
-    $("#dolar").parent().find('[datatype="xsd:dateTime"]').attr("content") || consultedAt;
+  const dateText = $("#dolar")
+    .parent()
+    .find('[datatype="xsd:dateTime"]')
+    .attr("content")
+    ?.split("T")[0]!;
 
   return {
     rates,

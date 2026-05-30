@@ -5,6 +5,9 @@
   "rest-client.environmentVariables": {
     "$shared": {
       "baseUrl": "http://localhost:3000"
+    },
+    "production": {
+      "baseUrl": "https://tasero.vercel.app"
     }
   },
   "rest-client.previewOption": "exchange",

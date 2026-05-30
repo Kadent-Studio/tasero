@@ -137,3 +137,46 @@ export async function revokeApiKey(id: string, reason?: string): Promise<void> {
     })
     .where(eq(apiKeys.id, id));
 }
+
+export type ApiKeyInfo = {
+  id: string;
+  name: string;
+  scopes: string[];
+  group: string | null;
+};
+
+export async function findApiKeyByToken(
+  token: string,
+): Promise<ApiKeyInfo | null> {
+  const hash = crypto.createHash("sha256").update(token).digest("hex");
+
+  const record = await db
+    .select({
+      id: apiKeys.id,
+      name: apiKeys.name,
+      scopes: apiKeys.scopes,
+      group: apiKeys.group,
+      isActive: apiKeys.isActive,
+      expiresAt: apiKeys.expiresAt,
+      revokedAt: apiKeys.revokedAt,
+    })
+    .from(apiKeys)
+    .where(eq(apiKeys.keyHash, hash))
+    .limit(1)
+    .then((rows) => rows[0]);
+
+  if (!record || !record.isActive || record.revokedAt) {
+    return null;
+  }
+
+  if (record.expiresAt && new Date() > record.expiresAt) {
+    return null;
+  }
+
+  return {
+    id: record.id,
+    name: record.name,
+    scopes: record.scopes,
+    group: record.group,
+  };
+}

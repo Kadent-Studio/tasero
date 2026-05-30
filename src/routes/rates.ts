@@ -1,9 +1,10 @@
 import { Hono } from "hono";
+import { apiKeyMiddleware, requireScope } from "../middleware/api-key.ts";
 import { getBcvRates } from "../services/rates.ts";
 
-export const rates = new Hono();
+export const rates = new Hono().use(apiKeyMiddleware());
 
-rates.get("/bcv", async (c) => {
+rates.get("/bcv", requireScope("read:rates"), async (c) => {
   try {
     const result = await getBcvRates();
     return c.json(result);

@@ -1,0 +1,18 @@
+### ─────────────────────────────────────────────
+###  Tasero — Rates API
+### ─────────────────────────────────────────────
+
+@apiKey={{$dotenv TEST_API_KEY}}
+
+### Health check / Get BCV exchange rates
+# Requires API key with "read:rates" scope
+GET {{baseUrl}}/api/rates/bcv
+Authorization: Bearer {{apiKey}}
+
+### Get BCV rates — without auth (expect 401)
+GET {{baseUrl}}/api/rates/bcv
+
+### Get BCV rates — invalid API key (expect 401)
+GET {{baseUrl}}/api/rates/bcv
+Authorization: Bearer sk_tas_invalid_key_here
+

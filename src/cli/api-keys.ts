@@ -8,7 +8,7 @@ import {
   revokeApiKey,
   type ApiKeyListItem,
   type CreatedApiKey,
-} from "../services/api-keys.ts";
+} from "../services/api-keys";
 
 const SCOPE_OPTIONS = [
   { name: "Read rates (read:rates)", value: "read:rates" },

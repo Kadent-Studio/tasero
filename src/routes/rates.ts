@@ -1,6 +1,6 @@
 import { Hono } from "hono";
-import { apiKeyMiddleware, requireScope } from "../middleware/api-key.ts";
-import { getBcvRates } from "../services/rates.ts";
+import { apiKeyMiddleware, requireScope } from "../middleware/api-key";
+import { getBcvRates } from "../services/rates";
 
 export const rates = new Hono().use(apiKeyMiddleware());
 

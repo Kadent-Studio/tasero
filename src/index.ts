@@ -1,7 +1,7 @@
 import { Hono } from "hono";
-import { dbMiddleware } from "./db/index.ts";
-import { admin } from "./routes/admin.ts";
-import { rates } from "./routes/rates.ts";
+import { dbMiddleware } from "./db/index";
+import { admin } from "./routes/admin";
+import { rates } from "./routes/rates";
 
 const app = new Hono()
   .basePath("/api")

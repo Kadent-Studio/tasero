@@ -1,7 +1,7 @@
 import { neon } from "@neondatabase/serverless";
 import { drizzle } from "drizzle-orm/neon-http";
 import { createMiddleware } from "hono/factory";
-import relations from "./relations.ts";
+import relations from "./relations";
 
 const sql = neon(process.env.DATABASE_URL!);
 export const db = drizzle({ client: sql, relations });

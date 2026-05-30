@@ -1,6 +1,7 @@
 import * as cheerio from "cheerio";
 import { get } from "node:https";
 import { text } from "node:stream/consumers";
+import { getOrInsertCache } from "../lib/cache.ts";
 
 // ── Types ────────────────────────────────────────────────────────────────────
 
@@ -14,6 +15,11 @@ export interface BcvResult {
   rates: BcvRate[];
 }
 
+// ── Cache key ────────────────────────────────────────────────────────────────
+
+const CACHE_KEY = "bcv-rates";
+const CACHE_TTL_SECONDS = 10_800; // 3 horas
+
 // ── Scraping ─────────────────────────────────────────────────────────────────
 
 function fetchBcvHtml(): Promise<string> {
@@ -21,7 +27,6 @@ function fetchBcvHtml(): Promise<string> {
     const req = get(
       "https://www.bcv.org.ve",
       {
-        method: "GET",
         rejectUnauthorized: false,
       },
       (res) => {
@@ -57,11 +62,17 @@ function parseBcvRates(html: string): BcvRate[] {
 // ── Business logic ───────────────────────────────────────────────────────────
 
 export async function getBcvRates(): Promise<BcvResult> {
-  const html = await fetchBcvHtml();
-  const rates = parseBcvRates(html);
+  return await getOrInsertCache(
+    CACHE_KEY,
+    async () => {
+      const html = await fetchBcvHtml();
+      const rates = parseBcvRates(html);
 
-  return {
-    date: new Date().toISOString(),
-    rates,
-  };
+      return {
+        date: new Date().toISOString(),
+        rates,
+      };
+    },
+    { ttl: CACHE_TTL_SECONDS, tags: ["rates"] },
+  );
 }

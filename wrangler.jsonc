@@ -6,8 +6,9 @@
   "d1_databases": [
     {
       "binding": "DB",
-      "database_name": "tasero-db",
-      "migrations_dir": "drizzle",
+      "database_name": "prod-d1-tasero",
+      "database_id": "1db5ff25-14b8-426e-b25d-ea9869124f86",
+      "migrations_dir": "./drizzle/d1",
     },
   ],
 }

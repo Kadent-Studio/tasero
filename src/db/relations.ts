@@ -1,4 +1,4 @@
-import { buildRelations } from "drizzle-orm";
+import { defineRelations } from "drizzle-orm";
 import * as schema from "./schema.ts";
 
-export default buildRelations(schema, (r) => ({}));
+export default defineRelations(schema, () => ({}));

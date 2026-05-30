@@ -13,5 +13,6 @@
   "rest-client.previewOption": "exchange",
   "json.schemaDownload.trustedDomains": {
     "https://openapi.vercel.sh/vercel.json": true
-  }
+  },
+  "js/ts.preferences.importModuleSpecifierEnding": "js"
 }

@@ -1,11 +1,18 @@
+import * as cheerio from "cheerio";
 import { Hono } from "hono";
+import { Agent } from "undici";
 
-export const rates = new Hono<{ Bindings: CloudflareBindings }>();
+export const rates = new Hono();
+const agent = new Agent({
+  // Disable SSL certificate validation for all requests made with this agent
+  connect: { rejectUnauthorized: false },
+});
 
 rates.get("/bcv", async (c) => {
   try {
-    const res = await fetch("https://www.bcv.org.ve");
-
+    const res = await fetch("https://www.bcv.org.ve", {
+      dispatcher: agent as any,
+    });
     if (!res.ok) {
       return c.json(
         { error: "Error al obtener la tasa de cambio del BCV" },
@@ -13,32 +20,25 @@ rates.get("/bcv", async (c) => {
       );
     }
 
-    // Extract the value inside the element with id="dolar" using HTMLRewriter
-    let dolarRate = "";
-
-    await new HTMLRewriter()
-      .on("div#dolar", {
-        text(text) {
-          dolarRate += text.text;
-        },
-      })
-      // Transform the response stream to trigger the rewriter
-      .transform(res)
-      .arrayBuffer();
-
-    dolarRate = dolarRate.trim();
+    const html = await res.text();
+    const $ = cheerio.load(html);
+    const dolarRate = $("#dolar").text().trim();
 
     if (!dolarRate) {
       return c.json({ error: "No se pudo encontrar la tasa de cambio" }, 404);
     }
 
     // Clean up: remove extra whitespace and normalize decimal separator
-    const cleaned = dolarRate.replace(/\s+/g, "").replace(",", ".");
+    const cleaned = dolarRate.replace(/[^\d,.]/g, "").replace(",", ".");
 
     return c.json({
-      tasa: cleaned,
-      fecha: new Date().toISOString(),
-      fuente: "Banco Central de Venezuela",
+      date: new Date().toISOString(),
+      rates: [
+        {
+          currency: "USD",
+          rate: Number.parseFloat(cleaned),
+        },
+      ],
     });
   } catch (error) {
     console.error("Error scraping BCV:", error);

@@ -1,3 +1,3 @@
 import { Hono } from "hono";
 
-export const admin = new Hono<{ Bindings: CloudflareBindings }>();
+export const admin = new Hono();

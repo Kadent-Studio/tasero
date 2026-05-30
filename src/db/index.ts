@@ -1,19 +1,16 @@
-import { drizzle } from "drizzle-orm/d1";
-import * as schema from "./schema.ts";
-import relations from "./relations.ts";
+import { neon } from "@neondatabase/serverless";
+import { drizzle } from "drizzle-orm/neon-http";
 import { createMiddleware } from "hono/factory";
+import relations from "./relations.ts";
 
-export function getDb(bindings: CloudflareBindings) {
-  return drizzle(bindings.DB, { schema, relations });
-}
+const sql = neon(process.env.DATABASE_URL!);
+export const db = drizzle({ client: sql, relations });
 
-export type DrizzleDb = ReturnType<typeof getDb>;
+export type Db = typeof db;
 
 export const dbMiddleware = createMiddleware<{
-  Bindings: CloudflareBindings;
-  Variables: { db: DrizzleDb };
+  Variables: { db: Db };
 }>((c, next) => {
-  const db = getDb(c.env);
   c.set("db", db);
   return next();
 });

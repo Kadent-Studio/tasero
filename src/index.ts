@@ -1,9 +1,9 @@
 import { Hono } from "hono";
-import { dbMiddleware } from "./db";
-import { admin } from "./routes/admin";
-import { rates } from "./routes/rates";
+import { dbMiddleware } from "./db/index.ts";
+import { admin } from "./routes/admin.ts";
+import { rates } from "./routes/rates.ts";
 
-const app = new Hono<{ Bindings: CloudflareBindings }>()
+const app = new Hono()
   .basePath("/api")
   .use(dbMiddleware)
   .route("/admin", admin)

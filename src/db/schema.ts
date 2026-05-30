@@ -1,7 +1,7 @@
 import { sql } from "drizzle-orm";
-import { int, sqliteTable, text } from "drizzle-orm/sqlite-core";
+import { integer, jsonb, pgTable, text } from "drizzle-orm/pg-core";
 
-export const apiKeys = sqliteTable("api_keys", {
+export const apiKeys = pgTable("api_keys", {
   id: text("id").primaryKey(), // UUID v7
 
   // Identification
@@ -14,20 +14,20 @@ export const apiKeys = sqliteTable("api_keys", {
   group: text("group"), // Optional grouping (e.g. "team-1234" or "project-5678")
 
   // Permissions — JSON array of scope strings (e.g. ["read:items","write:items"])
-  scopes: text("scopes").notNull().default("[]"),
+  scopes: jsonb("scopes").notNull().default([]),
 
   // Lifecycle
-  isActive: int("is_active").notNull().default(1), // 0 = revoked, 1 = active
-  expiresAt: int("expires_at"), // Unix epoch seconds, null = never expires
-  lastUsedAt: int("last_used_at"), // Unix epoch seconds
-  revokedAt: int("revoked_at"), // Unix epoch seconds, set when isActive flips to 0
+  isActive: integer("is_active").notNull().default(1), // 0 = revoked, 1 = active
+  expiresAt: integer("expires_at"), // Unix epoch seconds, null = never expires
+  lastUsedAt: integer("last_used_at"), // Unix epoch seconds
+  revokedAt: integer("revoked_at"), // Unix epoch seconds, set when isActive flips to 0
   revokedReason: text("revoked_reason"), // Why the key was revoked
 
   // Timestamps (Unix epoch seconds)
-  createdAt: int("created_at")
+  createdAt: integer("created_at")
     .notNull()
-    .default(sql`(unixepoch())`),
-  updatedAt: int("updated_at")
+    .default(sql`(extract(epoch from now())::integer)`),
+  updatedAt: integer("updated_at")
     .notNull()
-    .default(sql`(unixepoch())`),
+    .default(sql`(extract(epoch from now())::integer)`),
 });

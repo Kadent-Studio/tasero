@@ -1,12 +1,12 @@
 {
   "compilerOptions": {
     "target": "ESNext",
-    "module": "ESNext",
-    "moduleResolution": "Bundler",
+    "module": "node20",
+    "moduleResolution": "node16",
     "strict": true,
     "skipLibCheck": true,
     "lib": ["ESNext"],
-    "types": ["vite/client", "./worker-configuration.d.ts", "node"],
+    "types": ["node"],
     "noEmit": true,
     "allowImportingTsExtensions": true
   }

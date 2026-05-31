@@ -1,11 +1,14 @@
-import { instrumentDrizzleClient } from "@kubiks/otel-drizzle";
-import { drizzle } from "drizzle-orm/neon-http";
+import { attachDatabasePool } from "@vercel/functions";
+import { drizzle } from "drizzle-orm/node-postgres";
 import { createMiddleware } from "hono/factory";
+import { Pool } from "pg";
 import relations from "./relations.js";
 
+const pool = new Pool({ connectionString: process.env.DATABASE_URL! });
+attachDatabasePool(pool);
+
 export function createDb() {
-  const db = drizzle(process.env.DATABASE_URL!, { relations });
-  instrumentDrizzleClient(db, { dbName: "tasero-db", tracerName: "tasero-db-drizzle" });
+  const db = drizzle({ client: pool, relations });
   return db;
 }
 

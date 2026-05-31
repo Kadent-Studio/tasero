@@ -24,6 +24,7 @@
     "@vercel/otel": "^2.1.2",
     "cheerio": "^1.2.0",
     "drizzle-orm": "1.0.0-rc.3",
+    "es-toolkit": "^1.47.0",
     "hono": "^4.12.23",
     "node-html-parser": "^7.0.0",
     "uuid": "^14.0.0",

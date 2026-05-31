@@ -16,3 +16,15 @@ GET {{baseUrl}}/api/rates/bcv
 GET {{baseUrl}}/api/rates/bcv
 Authorization: Bearer sk_tas_invalid_key_here
 
+### ─────────────────────────────────────────────
+### Binance P2P exchange rates
+### ─────────────────────────────────────────────
+
+### Get Binance P2P USDT/VES rates
+# Requires API key with "read:rates" scope
+GET {{baseUrl}}/api/rates/binance-p2p
+Authorization: Bearer {{apiKey}}
+
+### Get Binance P2P rates — without auth (expect 401)
+GET {{baseUrl}}/api/rates/binance-p2p
+

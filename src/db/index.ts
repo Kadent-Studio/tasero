@@ -5,8 +5,7 @@ import { Pool } from "pg";
 import relations from "./relations.js";
 
 const pool = new Pool({
-  connectionString: process.env.DATABASE_URL!,
-  ssl: { rejectUnauthorized: true },
+  connectionString: process.env.DATABASE_URL!.replace("sslmode=require", "sslmode=verify-full"),
 });
 attachDatabasePool(pool);
 

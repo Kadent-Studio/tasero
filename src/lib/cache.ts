@@ -8,7 +8,7 @@ export async function getOrInsertCache<T>(
     tags?: string[];
   },
 ): Promise<T> {
-  const { ttl, tags = [key] } = options;
+  const { ttl, tags } = options;
   const cache = getCache();
 
   const cached = (await cache.get(key)) as T | undefined;

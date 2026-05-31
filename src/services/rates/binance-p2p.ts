@@ -135,8 +135,6 @@ export async function getBinanceP2PRates(asset = "USDT", fiat = "VES"): Promise<
     fetchBinanceP2PAds(asset, fiat, "BUY"),
     fetchBinanceP2PAds(asset, fiat, "SELL"),
   ]);
-  console.log("buyAds", buyAds);
-  console.log("sellAds", sellAds);
 
   const compute = (ads: BinanceP2PAd[], tradeType: "BUY" | "SELL") => {
     const qualified = filterQualifiedAds(ads);

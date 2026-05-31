@@ -3,7 +3,7 @@ import { eq } from "drizzle-orm";
 import { bearerAuth } from "hono/bearer-auth";
 import { createMiddleware } from "hono/factory";
 import { HTTPException } from "hono/http-exception";
-import { db } from "../db/index.js";
+import type { Db } from "../db/index.js";
 import { apiKeys } from "../db/schema.js";
 import { findApiKeyByToken, type ApiKeyInfo } from "../services/api-keys.js";
 
@@ -13,7 +13,7 @@ import { findApiKeyByToken, type ApiKeyInfo } from "../services/api-keys.js";
 
 export function apiKeyMiddleware() {
   return bearerAuth<{
-    Variables: { apiKey: ApiKeyInfo };
+    Variables: { apiKey: ApiKeyInfo; db: Db };
   }>({
     async verifyToken(token, c) {
       const record = await findApiKeyByToken(token);
@@ -21,7 +21,7 @@ export function apiKeyMiddleware() {
 
       // Update last_used_at in the background (fire-and-forget)
       waitUntil(
-        db.update(apiKeys).set({ lastUsedAt: new Date() }).where(eq(apiKeys.id, record.id)),
+        c.var.db.update(apiKeys).set({ lastUsedAt: new Date() }).where(eq(apiKeys.id, record.id)),
       );
 
       c.set("apiKey", record);

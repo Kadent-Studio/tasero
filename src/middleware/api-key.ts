@@ -16,7 +16,7 @@ export function apiKeyMiddleware() {
     Variables: { apiKey: ApiKeyInfo; db: Db };
   }>({
     async verifyToken(token, c) {
-      const record = await findApiKeyByToken(token);
+      const record = await findApiKeyByToken(c.var.db, token);
       if (!record) return false;
 
       // Update last_used_at in the background (fire-and-forget)

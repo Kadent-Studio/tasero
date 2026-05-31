@@ -39,7 +39,7 @@ const apiKeyRevokeSchema = z.object({
 export const admin = new Hono().use(apiKeyMiddleware());
 
 admin.get("/api-keys", requireScope("read:admin"), async (c) => {
-  const keys = await listApiKeys();
+  const keys = await listApiKeys(c.var.db);
   return c.json(keys);
 });
 
@@ -49,7 +49,7 @@ admin.post(
   zValidator("json", apiKeyCreateSchema),
   async (c) => {
     const body = c.req.valid("json");
-    const createdKey = await createApiKey(body);
+    const createdKey = await createApiKey(c.var.db, body);
     return c.json(createdKey, 201);
   },
 );
@@ -66,7 +66,7 @@ admin.post(
       return c.json({ error: "`id` is required" }, 400);
     }
 
-    await revokeApiKey(id, body.reason ?? undefined);
+    await revokeApiKey(c.var.db, id, body.reason ?? undefined);
     return c.json({ id, revoked: true });
   },
 );

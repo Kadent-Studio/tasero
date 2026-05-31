@@ -9,6 +9,9 @@ import {
   type ApiKeyListItem,
   type CreatedApiKey,
 } from "../services/api-keys.js";
+import { createDb } from "../db/index.js";
+
+const db = createDb();
 
 const SCOPE_OPTIONS = [
   { name: "Read rates (read:rates)", value: "read:rates" },
@@ -89,7 +92,7 @@ async function screenCreate() {
   const maxAge = days ? Number(days) * 86400000 : null; // Convert days to milliseconds
   const expiresAt = maxAge ? new Date(Date.now() + maxAge) : null;
 
-  const created = await createApiKey({
+  const created = await createApiKey(db, {
     name,
     description: description || undefined,
     group: group || undefined,
@@ -101,12 +104,12 @@ async function screenCreate() {
 }
 
 async function screenList() {
-  const keys = await listApiKeys();
+  const keys = await listApiKeys(db);
   printApiKeyList(keys);
 }
 
 async function screenRevoke() {
-  const keys = await listActiveApiKeys();
+  const keys = await listActiveApiKeys(db);
 
   if (keys.length === 0) {
     console.log("\nNo active API keys to revoke.\n");
@@ -135,7 +138,7 @@ async function screenRevoke() {
     return;
   }
 
-  await revokeApiKey(choice, reason || undefined);
+  await revokeApiKey(db, choice, reason || undefined);
   console.log("\n🔴 API key revoked successfully.\n");
 }
 

@@ -1,6 +1,6 @@
 import { desc, eq } from "drizzle-orm";
 import crypto from "node:crypto";
-import { db } from "../db/index.js";
+import type { Db } from "../db/index.js";
 import { apiKeys } from "../db/schema.js";
 
 const KEY_PREFIX = "sk_tas_";
@@ -62,7 +62,7 @@ export function generateApiKey(): {
 
 // ── CRUD ─────────────────────────────────────────────────────────────────────
 
-export async function createApiKey(input: CreateApiKeyInput): Promise<CreatedApiKey> {
+export async function createApiKey(db: Db, input: CreateApiKeyInput): Promise<CreatedApiKey> {
   const { fullKey, prefix, hash } = generateApiKey();
 
   const [{ id }] = await db
@@ -90,7 +90,7 @@ export async function createApiKey(input: CreateApiKeyInput): Promise<CreatedApi
   };
 }
 
-export async function listApiKeys(): Promise<ApiKeyListItem[]> {
+export async function listApiKeys(db: Db): Promise<ApiKeyListItem[]> {
   const keys = await db
     .select({
       id: apiKeys.id,
@@ -111,7 +111,7 @@ export async function listApiKeys(): Promise<ApiKeyListItem[]> {
   return keys;
 }
 
-export async function listActiveApiKeys(): Promise<ApiKeyPick[]> {
+export async function listActiveApiKeys(db: Db): Promise<ApiKeyPick[]> {
   const keys = await db
     .select({
       id: apiKeys.id,
@@ -125,7 +125,7 @@ export async function listActiveApiKeys(): Promise<ApiKeyPick[]> {
   return keys;
 }
 
-export async function revokeApiKey(id: string, reason?: string): Promise<void> {
+export async function revokeApiKey(db: Db, id: string, reason?: string): Promise<void> {
   await db
     .update(apiKeys)
     .set({
@@ -143,7 +143,7 @@ export type ApiKeyInfo = {
   group: string | null;
 };
 
-export async function findApiKeyByToken(token: string): Promise<ApiKeyInfo | null> {
+export async function findApiKeyByToken(db: Db, token: string): Promise<ApiKeyInfo | null> {
   const hash = crypto.createHash("sha256").update(token).digest("hex");
 
   const record = await db

@@ -1,6 +1,5 @@
 import * as cheerio from "cheerio";
-import { get } from "node:https";
-import { text } from "node:stream/consumers";
+import { Agent, fetch } from "undici";
 
 // ── Types ────────────────────────────────────────────────────────────────────
 
@@ -17,21 +16,23 @@ export interface BcvResult {
 
 // ── Scraping ─────────────────────────────────────────────────────────────────
 
-function fetchBcvHtml(): Promise<string> {
-  return new Promise<string>((resolve, reject) => {
-    const req = get(
-      "https://www.bcv.org.ve",
-      {
-        rejectUnauthorized: false,
-      },
-      (res) => {
-        text(res).then(resolve, reject);
-      },
-    );
+const unsafeBcvAgent = new Agent({
+  connect: {
+    rejectUnauthorized: false,
+  },
+});
 
-    req.on("error", reject);
-    req.end();
+async function fetchBcvHtml(signal: AbortSignal): Promise<string> {
+  const response = await fetch("https://www.bcv.org.ve", {
+    dispatcher: unsafeBcvAgent,
+    signal: AbortSignal.any([signal, AbortSignal.timeout(5000)]), // 5 segundos timeout
   });
+
+  if (!response.ok) {
+    throw new Error(`Error fetching BCV page: ${response.status} ${response.statusText}`);
+  }
+
+  return await response.text();
 }
 
 function findRateInHtml($: cheerio.CheerioAPI, selector: string, currency: string) {
@@ -58,8 +59,8 @@ function parseBcvRates($: cheerio.CheerioAPI): BcvRate[] {
 
 // ── Business logic ───────────────────────────────────────────────────────────
 
-export async function getBcvRates(): Promise<BcvResult> {
-  const html = await fetchBcvHtml();
+export async function getBcvRates(signal: AbortSignal): Promise<BcvResult> {
+  const html = await fetchBcvHtml(signal);
   const $ = cheerio.load(html);
   const rates = parseBcvRates($);
 

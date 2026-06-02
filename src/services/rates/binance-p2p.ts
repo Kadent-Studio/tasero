@@ -42,12 +42,19 @@ const BINANCE_P2P_URL = "https://p2p.binance.com/bapi/c2c/v2/friendly/c2c/adv/se
 /** Minimum transaction quantity in USDT to filter out bait ads. */
 const MIN_CRYPTO_AMOUNT = 10; // mínimo USDT
 
-async function fetchBinanceP2PAds(
-  asset: string,
-  fiat: string,
-  tradeType: "BUY" | "SELL",
-): Promise<BinanceP2PRawResponse> {
+async function fetchBinanceP2PAds({
+  asset,
+  fiat,
+  tradeType,
+  signal,
+}: {
+  asset: string;
+  fiat: string;
+  tradeType: "BUY" | "SELL";
+  signal: AbortSignal;
+}): Promise<BinanceP2PRawResponse> {
   const res = await fetch(BINANCE_P2P_URL, {
+    signal,
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -130,10 +137,18 @@ function applySafetyMargin(price: number, tradeType: "BUY" | "SELL", marginPerce
 
 // ── Business logic ───────────────────────────────────────────────────────────
 
-export async function getBinanceP2PRates(asset = "USDT", fiat = "VES"): Promise<BinanceP2PResult> {
+export async function getBinanceP2PRates({
+  asset = "USDT",
+  fiat = "VES",
+  signal,
+}: {
+  asset?: string;
+  fiat?: string;
+  signal: AbortSignal;
+}): Promise<BinanceP2PResult> {
   const [buyAds, sellAds] = await Promise.all([
-    fetchBinanceP2PAds(asset, fiat, "BUY"),
-    fetchBinanceP2PAds(asset, fiat, "SELL"),
+    fetchBinanceP2PAds({ asset, fiat, tradeType: "BUY", signal }),
+    fetchBinanceP2PAds({ asset, fiat, tradeType: "SELL", signal }),
   ]);
 
   const compute = (ads: BinanceP2PAd[], tradeType: "BUY" | "SELL") => {

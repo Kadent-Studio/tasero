@@ -7,14 +7,14 @@
 ### Health check / Get BCV exchange rates
 # Requires API key with "read:rates" scope
 GET {{baseUrl}}/api/rates/bcv
-Authorization: Bearer {{apiKey}}
+X-Api-Key: {{apiKey}}
 
 ### Get BCV rates — without auth (expect 401)
 GET {{baseUrl}}/api/rates/bcv
 
 ### Get BCV rates — invalid API key (expect 401)
 GET {{baseUrl}}/api/rates/bcv
-Authorization: Bearer sk_tas_invalid_key_here
+X-Api-Key: sk_tas_invalid_key_here
 
 ### ─────────────────────────────────────────────
 ### Binance P2P exchange rates
@@ -23,7 +23,7 @@ Authorization: Bearer sk_tas_invalid_key_here
 ### Get Binance P2P USDT/VES rates
 # Requires API key with "read:rates" scope
 GET {{baseUrl}}/api/rates/binance-p2p
-Authorization: Bearer {{apiKey}}
+X-Api-Key: {{apiKey}}
 
 ### Get Binance P2P rates — without auth (expect 401)
 GET {{baseUrl}}/api/rates/binance-p2p

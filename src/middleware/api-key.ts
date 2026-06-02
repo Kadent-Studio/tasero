@@ -7,14 +7,26 @@ import type { Db } from "../db/index.js";
 import { apiKeys } from "../db/schema.js";
 import { findApiKeyByToken, type ApiKeyInfo } from "../services/api-keys.js";
 
-// ── Types ────────────────────────────────────────────────────────────────────
-
 // ── Middleware factory ────────────────────────────────────────────────────────
 
+/**
+ * Creates a Hono middleware that validates an API key sent via the `x-api-key`
+ * header (instead of `Authorization: Bearer`).
+ *
+ * Using a dedicated header allows CDNs to cache responses without conflicting with the standard `Authorization` header, which
+ * many CDNs treat as a cache-buster.
+ *
+ * Usage:
+ * ```
+ * x-api-key: sk_tas_<full-key>
+ * ```
+ */
 export function apiKeyMiddleware() {
   return bearerAuth<{
     Variables: { apiKey: ApiKeyInfo; db: Db };
   }>({
+    headerName: "x-api-key",
+    prefix: "",
     async verifyToken(token, c) {
       const record = await findApiKeyByToken(c.var.db, token);
       if (!record) return false;
@@ -35,9 +47,9 @@ export function apiKeyMiddleware() {
  * Creates a Hono middleware that requires a valid API key with the specified
  * scope (or the wildcard `*` scope).
  *
- * The API key must be sent as a Bearer token in the `Authorization` header:
+ * The API key must be sent via the `x-api-key` header:
  * ```
- * Authorization: Bearer sk_tas_<full-key>
+ * x-api-key: sk_tas_<full-key>
  * ```
  *
  * Automatically updates `last_used_at` on the key upon successful validation.
